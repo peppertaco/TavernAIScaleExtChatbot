@@ -1401,6 +1401,7 @@ app.post("/importchat", urlencodedParser, function(request, response){
                         new_chat[i] = {};
                         new_chat[0]['user_name'] = 'You';
                         new_chat[0]['character_name'] = ch_name;
+                        new_chat[0]['memory'] = "";
                         new_chat[0]['create_date'] = Date.now();
                         i++;
                         jsonData.histories.histories[0].msgs.forEach(function(item) {

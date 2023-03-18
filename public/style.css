@@ -354,6 +354,11 @@ textarea{
     height: 200px;
     margin-top: 0px;
 }
+#memory_textarea{
+    width: 92%;
+    height: 200px;
+    margin-top: 0px;
+}
 
 #character_name_pole{
 
