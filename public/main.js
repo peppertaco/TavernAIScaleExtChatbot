@@ -963,7 +963,6 @@ async function Generate(type) {
                     // TODO: instead of role user content use role system name example_user
                     // message from the user so the model doesn't confuse the context (maybe, I just think that this should be done)
                     if (example_block.length != 0) {
-                        tryInsertAuthorsNote(examples_tosend);
                         examples_tosend.push(new_chat_msg);
                     }
                     for (let k = 0; k < example_block.length; k++) {
@@ -1029,7 +1028,6 @@ async function Generate(type) {
                         // add all the messages from the example
                         if ((total_count + example_count + start_chat_count) < (this_max_context - this_max_tokens)) {
                             if (k == 0) {
-                                tryInsertAuthorsNote(examples_tosend);
                                 examples_tosend.push(new_chat_msg);
                                 total_count += start_chat_count;
                             }
