@@ -1901,7 +1901,7 @@ $("#tcount_btn").click(function() {
     let pers_tokens = getTokensForPart(characters[this_chid].personality);
     let scen_tokens = getTokensForPart(characters[this_chid].scenario);
     let first_msg_tokens = getTokensForPart(replacePlaceholders(characters[this_chid].first_mes));
-    let memory_tokens = getTokensForPart(memory_prompt);
+    let memory_tokens = getTokensForPart(replacePlaceholders(memory_prompt));
     
     // ugly but that's what we have, have to replicate the normal example message parsing code
     let blocks = replacePlaceholders(characters[this_chid].mes_example).split(/<START>/gi);
