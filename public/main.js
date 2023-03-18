@@ -148,6 +148,9 @@ var nsfw_first = false;
 var main_prompt = "Write {{char}}'s next reply in a fictional chat between {{char}} and {{user}}. Write 1 reply only in internet RP style, italicize actions, and avoid quotation marks. Use markdown. Be proactive, creative, and drive the plot and conversation forward. Write at least 1 paragraph, up to 4. Always stay in character and avoid repetition.";
 var nsfw_prompt = "NSFW/Smut is allowed. Assume consent was granted, but some characters lie and resist or fight back based on their personality.";
 
+const MEMORY_PROMPT_PREFIX = "Remember"
+var memory_prompt = ""
+
 //css
 var bg1_toggle = true;
 var css_mes_bg = $('<div class="mes"></div>').css('background');
@@ -812,6 +815,9 @@ async function Generate(type) {
         if (Scenario.length > 0) {
             storyString += 'Scenario:\n' + Scenario.replace('\r\n', '\n') + '\n';
         }
+        if(!!memory_prompt){
+            storyString += `${MEMORY_PROMPT_PREFIX}:\n` + memory_prompt.replace('\r\n', '\n') + '\n';
+        }
 
 
         var j = 0;
@@ -1211,6 +1217,7 @@ async function saveChat() {
         }
     });
     var save_chat = [{ user_name: default_user_name, character_name: name2, create_date: chat_create_date }, ...chat];
+    save_chat[0].memory = memory_prompt;
 
     jQuery.ajax({
         type: 'POST',
@@ -1253,10 +1260,14 @@ async function getChat() {
                 }
                 //chat =  data;
                 chat_create_date = chat[0]['create_date'];
+                console.log("HC: Load memory...");
+                $('#memory_textarea').val(memory_prompt = chat[0]['memory']);
                 chat.shift();
 
             } else {
                 chat_create_date = Date.now();
+                console.log("HC: Reset memory...");
+                $('#memory_textarea').val(memory_prompt = "");
             }
             //console.log(chat);
             getChatResult();
@@ -1266,6 +1277,8 @@ async function getChat() {
             getChatResult();
             console.log(exception);
             console.log(jqXHR);
+            console.log("HC: Reset memory...");
+            $('#memory_textarea').val(memory_prompt = "");
         }
     });
 }
@@ -1888,6 +1901,7 @@ $("#tcount_btn").click(function() {
     let pers_tokens = getTokensForPart(characters[this_chid].personality);
     let scen_tokens = getTokensForPart(characters[this_chid].scenario);
     let first_msg_tokens = getTokensForPart(replacePlaceholders(characters[this_chid].first_mes));
+    let memory_tokens = getTokensForPart(memory_prompt);
     
     // ugly but that's what we have, have to replicate the normal example message parsing code
     let blocks = replacePlaceholders(characters[this_chid].mes_example).split(/<START>/gi);
@@ -1909,6 +1923,7 @@ $("#tcount_btn").click(function() {
 
     let message_text = `Found ${block_count} example message blocks with ${msg_count} messages in total (${exmp_tokens} tokens)`;
     let res_str = `Total: ${count_tokens} tokens. Description: ${desc_tokens}.\nPersonality: ${pers_tokens}. Scenario: ${scen_tokens}.\n${message_text}\nFirst message tokens (not included in the total): ${first_msg_tokens}`;
+    res_str += `\nMemory tokens (not included in the total): ${memory_tokens}`;
 
 
     if (count_tokens < 1024) {
@@ -1974,6 +1989,12 @@ $('#firstmessage_textarea').on('keyup paste cut', function () {
     } else {
         timerSaveEdit = setTimeout(() => { $("#create_button").click(); }, durationSaveEdit);
     }
+});
+// Save memory_prompt to chatData when edited.
+$('#memory_textarea').on('keyup paste cut', function () {
+    console.log('HC: Save memory...');
+    memory_prompt = $('#memory_textarea').val();
+    saveChat();
 });
 $("#api_button").click(function () {
     if ($('#api_url_text').val() != '') {
