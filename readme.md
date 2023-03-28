@@ -1,3 +1,13 @@
+## Terrible modification version to use chatbotkit
+
+Anyway it works
+
+
+---
+---
+---
+# Original readme
+
 # TavernAI scale spellbook
 quick hack to get tavernai to work with spellbook.scale.com for playing around with GPT4. based off of [cncanon1's](https://github.com/CncAnon1/) existing OpenAI mod.
 
