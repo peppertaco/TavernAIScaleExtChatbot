@@ -1112,62 +1112,210 @@ app.post("/generate_scale", jsonParser, function(request, response_generate_scal
       }
     });
    
-    console.log("sending request to", api_url_scale);
-   var config = {
-     method: "post",
-     url: api_url_scale,
-     headers: {
-       "Content-Type": "application/json",
-       Authorization: "Basic " + api_key_scale,
-     },
-     data: {
-       input: { input: messagePayload.join("\n") },
-     },
-   };
-   
-   axios(config)
-   .then(function (response) {
-       console.log("generate_scale response", response.status);
-       if (response.status <= 299) {
-            console.log(response.data);
-            response_generate_scale.send(response.data);
-       } else if (response.status == 400) {
-            console.log('Validation error');
-            response_generate_scale.send({ error: true });
-       } else if (response.status == 401) {
-            console.log('Access Token is incorrect');
-            response_generate_scale.send({ error: true });
-       } else if (response.status == 402) {
-            console.log('An active subscription is required to access this endpoint');
-            response_generate_scale.send({ error: true });
-       } else if (response.status == 500 || response.status == 409) {
-            console.log(response.data);
-            response_generate_scale.send({ error: true });
-       }
-   })
-   .catch(function (error) {
-       if(error.response){
-           if (request.body.stream) {
-               error.response.data.on('data', chunk => {
-                   console.log(chunk.toString());
-               });                  
-           } else {
-                console.log("generate_scale promise rejected");
-                console.log({
-                    message: error.message,
-                    method: error.config.method,
-                    code: error.code,
-                    status: error.response.status,
-                    url: error.config.url,
-                    headers: error.config.headers,
-                })
-                console.log("response headers:", JSON.stringify(error.response.headers, null, 2));
-                console.log("response data:", error.response.data);
-           }
-       }
-       response_generate_scale.send({ error: true });
-   });
+    console.log("sending request");
+
+    input = messagePayload.join("\n");
+    kit_conversation_create(response_generate_scale,input);
 });
+
+function kit_conversation_create(response_generate_scale,input){
+    var config = {
+        method: "post",
+        url: "https://chatbotkit.com/api/v1/conversation/create",
+        headers: {
+          "accept": "application/json",
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + api_key_scale
+        },
+        data: {
+          backstory: "",
+          datasetId: "",
+          meta: {},
+          model: "gpt-4",
+          skillsetId: ""
+        },
+      };
+
+      axios(config)
+      .then(function (response) {
+          console.log("generate_chatbotkit response", response.status);
+          if (response.status <= 299) {
+               console.log(response.data);
+               const conversationId = response.data.id;
+               kit_message_send(response_generate_scale,input,conversationId);
+          } else {
+            console.log(response.data);
+            response_generate_scale.send({ error: true });
+          }
+      })
+      .catch(function (error) {
+        console.log(error);
+          if(error.response){
+              if (request.body.stream) {
+                  error.response.data.on('data', chunk => {
+                      console.log(chunk.toString());
+                  });                  
+              } else {
+                   console.log("generate_chatbotkit promise rejected");
+                   console.log({
+                       message: error.message,
+                       method: error.config.method,
+                       code: error.code,
+                       status: error.response.status,
+                       url: error.config.url,
+                       headers: error.config.headers,
+                   })
+                   console.log("response headers:", JSON.stringify(error.response.headers, null, 2));
+                   console.log("response data:", error.response.data);
+              }
+          }
+          response_generate_scale.send({ error: true });
+      });
+}
+function kit_message_send(response_generate_scale,input, conversationId){
+    var config = {
+        method: "post",
+        url: `https://chatbotkit.com/api/v1/conversation/${conversationId}/send`,
+        headers: {
+          "accept": "application/json",
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + api_key_scale
+        },
+        data: {
+            text: input,
+            entities: []
+        },
+      };
+
+      axios(config)
+      .then(function (response) {
+          console.log("generate_chatbotkit response", response.status);
+          if (response.status <= 299) {
+               console.log(response.data);
+               kit_message_receive(response_generate_scale,conversationId);
+          } else {
+            console.log(response.data);
+            response_generate_scale.send({ error: true });
+          }
+      })
+      .catch(function (error) {
+        console.log(error);
+          if(error.response){
+              if (request.body.stream) {
+                  error.response.data.on('data', chunk => {
+                      console.log(chunk.toString());
+                  });                  
+              } else {
+                   console.log("generate_chatbotkit promise rejected");
+                   console.log({
+                       message: error.message,
+                       method: error.config.method,
+                       code: error.code,
+                       status: error.response.status,
+                       url: error.config.url,
+                       headers: error.config.headers,
+                   })
+                   console.log("response headers:", JSON.stringify(error.response.headers, null, 2));
+                   console.log("response data:", error.response.data);
+              }
+          }
+          response_generate_scale.send({ error: true });
+      });
+}
+function kit_message_receive(response_generate_scale,conversationId){
+    var config = {
+        method: "post",
+        url: `https://chatbotkit.com/api/v1/conversation/${conversationId}/receive`,
+        headers: {
+          "accept": "application/json",
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + api_key_scale
+        },
+        data: {},
+      };
+
+      axios(config)
+      .then(function (response) {
+          console.log("generate_chatbotkit response", response.status);
+          if (response.status <= 299) {
+               console.log(response.data);
+               const output = response.data.text;
+               kit_conversation_delete(response_generate_scale,conversationId,output);
+          } else {
+            console.log(response.data);
+            response_generate_scale.send({ error: true });
+          }
+      })
+      .catch(function (error) {
+        console.log(error);
+          if(error.response){
+              if (request.body.stream) {
+                  error.response.data.on('data', chunk => {
+                      console.log(chunk.toString());
+                  });                  
+              } else {
+                   console.log("generate_chatbotkit promise rejected");
+                   console.log({
+                       message: error.message,
+                       method: error.config.method,
+                       code: error.code,
+                       status: error.response.status,
+                       url: error.config.url,
+                       headers: error.config.headers,
+                   })
+                   console.log("response headers:", JSON.stringify(error.response.headers, null, 2));
+                   console.log("response data:", error.response.data);
+              }
+          }
+          response_generate_scale.send({ error: true });
+      });
+}
+function kit_conversation_delete(response_generate_scale,conversationId,output){
+    var config = {
+        method: "post",
+        url: `https://chatbotkit.com/api/v1/conversation/${conversationId}/delete`,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + api_key_scale
+        },
+        data: {},
+      };
+
+      axios(config)
+      .then(function (response) {
+          console.log("generate_chatbotkit response", response.status);
+          if (response.status <= 299) {
+               console.log(response.data);
+               response_generate_scale.send({"output": output});
+          } else {
+            console.log(response.data);
+            response_generate_scale.send({ error: true });
+          }
+      })
+      .catch(function (error) {
+        console.log(error);
+          if(error.response){
+              if (request.body.stream) {
+                  error.response.data.on('data', chunk => {
+                      console.log(chunk.toString());
+                  });                  
+              } else {
+                   console.log("generate_chatbotkit promise rejected");
+                   console.log({
+                       message: error.message,
+                       method: error.config.method,
+                       code: error.code,
+                       status: error.response.status,
+                       url: error.config.url,
+                       headers: error.config.headers,
+                   })
+                   console.log("response headers:", JSON.stringify(error.response.headers, null, 2));
+                   console.log("response data:", error.response.data);
+              }
+          }
+          response_generate_scale.send({ error: true });
+      });
+}
 
 app.post("/generate_openai", jsonParser, function(request, response_generate_openai = response){
     if(!request.body) return response_generate_openai.sendStatus(400);
