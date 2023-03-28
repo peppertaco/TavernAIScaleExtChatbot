@@ -1151,7 +1151,6 @@ function kit_conversation_create(response_generate_scale,input){
           }
       })
       .catch(function (error) {
-        console.log(error);
           if(error.response){
 
                    console.log("kit_conversation_create promise rejected");
@@ -1197,7 +1196,6 @@ function kit_message_send(response_generate_scale,input, conversationId){
           }
       })
       .catch(function (error) {
-        console.log(error);
           if(error.response){
 
                    console.log("kit_message_send promise rejected");
@@ -1241,7 +1239,6 @@ function kit_message_receive(response_generate_scale,conversationId){
           }
       })
       .catch(function (error) {
-        console.log(error);
           if(error.response){
                    console.log("kit_message_receive promise rejected");
                    console.log({
@@ -1281,7 +1278,6 @@ function kit_conversation_delete(response_generate_scale,conversationId,output){
           }
       })
       .catch(function (error) {
-        console.log(error);
           if(error.response){
               if (request.body.stream) {
                   error.response.data.on('data', chunk => {
