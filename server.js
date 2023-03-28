@@ -1020,6 +1020,8 @@ app.post("/getstatus_scale", jsonParser, function(request, response_getstatus_sc
     if(!request.body) return response_getstatus_scale.sendStatus(400);
     api_key_scale = request.body.key;
     api_url_scale = request.body.url;
+    response_getstatus_scale.send({ ok: true });
+/*
     var args = {
         headers: { "Authorization": "Basic "+ api_key_scale }
     };
@@ -1066,7 +1068,7 @@ app.post("/getstatus_scale", jsonParser, function(request, response_getstatus_sc
         console.log('');
 	      console.log('something went wrong on the request', err.request.options);
         response_getstatus_scale.send({error: true});
-    });
+    });*/
 });
 
 //***********Open.ai API 
