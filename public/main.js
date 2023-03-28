@@ -2117,6 +2117,24 @@ $("#dialogue_del_mes_cancel").click(function () {
     this_del_mes = 0;
 
 });
+$("#option_regenerate2").click(function () {
+    if (is_send_press == false) {
+        is_send_press = true;
+        Generate('regenerate');
+    }
+});
+$("#option_delete_mes2").click(function () {
+    if (this_chid != undefined && !is_send_press) {
+        $('#dialogue_del_mes').css('display', 'block');
+        $('#send_form').css('display', 'none');
+        $('.del_checkbox').each(function () {
+            if ($(this).parent().attr('mesid') != 0) {
+                $(this).css("display", "block");
+                $(this).parent().children('.for_checkbox').css('display', 'none');
+            }
+        });
+    }
+});
 $("#dialogue_del_mes_ok").click(function () {
     $('#dialogue_del_mes').css('display', 'none');
     $('#send_form').css('display', css_send_form_display);
