@@ -1140,7 +1140,7 @@ function kit_conversation_create(response_generate_scale,input){
 
       axios(config)
       .then(function (response) {
-          console.log("generate_chatbotkit response", response.status);
+          console.log("kit_conversation_create response", response.status);
           if (response.status <= 299) {
                console.log(response.data);
                const conversationId = response.data.id;
@@ -1158,7 +1158,7 @@ function kit_conversation_create(response_generate_scale,input){
                       console.log(chunk.toString());
                   });                  
               } else {
-                   console.log("generate_chatbotkit promise rejected");
+                   console.log("kit_conversation_create promise rejected");
                    console.log({
                        message: error.message,
                        method: error.config.method,
@@ -1191,7 +1191,7 @@ function kit_message_send(response_generate_scale,input, conversationId){
 
       axios(config)
       .then(function (response) {
-          console.log("generate_chatbotkit response", response.status);
+          console.log("kit_message_send response", response.status);
           if (response.status <= 299) {
                console.log(response.data);
                kit_message_receive(response_generate_scale,conversationId);
@@ -1208,7 +1208,7 @@ function kit_message_send(response_generate_scale,input, conversationId){
                       console.log(chunk.toString());
                   });                  
               } else {
-                   console.log("generate_chatbotkit promise rejected");
+                   console.log("kit_message_send promise rejected");
                    console.log({
                        message: error.message,
                        method: error.config.method,
@@ -1238,7 +1238,7 @@ function kit_message_receive(response_generate_scale,conversationId){
 
       axios(config)
       .then(function (response) {
-          console.log("generate_chatbotkit response", response.status);
+          console.log("kit_message_receive response", response.status);
           if (response.status <= 299) {
                console.log(response.data);
                const output = response.data.text;
@@ -1256,7 +1256,7 @@ function kit_message_receive(response_generate_scale,conversationId){
                       console.log(chunk.toString());
                   });                  
               } else {
-                   console.log("generate_chatbotkit promise rejected");
+                   console.log("kit_message_receive promise rejected");
                    console.log({
                        message: error.message,
                        method: error.config.method,
@@ -1285,7 +1285,7 @@ function kit_conversation_delete(response_generate_scale,conversationId,output){
 
       axios(config)
       .then(function (response) {
-          console.log("generate_chatbotkit response", response.status);
+          console.log("kit_conversation_delete response", response.status);
           if (response.status <= 299) {
                console.log(response.data);
                response_generate_scale.send({"output": output});
@@ -1302,7 +1302,7 @@ function kit_conversation_delete(response_generate_scale,conversationId,output){
                       console.log(chunk.toString());
                   });                  
               } else {
-                   console.log("generate_chatbotkit promise rejected");
+                   console.log("kit_conversation_delete promise rejected");
                    console.log({
                        message: error.message,
                        method: error.config.method,
